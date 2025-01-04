@@ -5,24 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fabric Defect Detection</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
-    <h1>Fabric Defect Detection</h1>
+    <header>
+        <h1>Fabric Defect Detection</h1>
+        <p>Identify fabric defects with ease!</p>
+    </header>
+    
+    <!-- Live Camera Feed -->
     <div class="camera-feed">
-        <img src="/video_feed" alt="Camera Feed">
+        <img id="camera-stream" src="/video_feed" alt="Camera Feed">
+        <div id="loading-spinner" class="spinner hidden">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading...</p>
+        </div>
     </div>
+    
+    <!-- Controls -->
     <div class="controls">
-        <form method="POST" action="/control">
-            <button name="action" value="start">Start</button>
-            <button name="action" value="pause">Pause</button>
-            <button name="action" value="stop">Stop</button>
-        </form>
-        <form method="POST" action="/capture">
-            <button name="defect_type" value="holes">Holes</button>
-            <button name="defect_type" value="foreign_yarn">Foreign Yarn</button>
-            <button name="defect_type" value="surface_contamination">Surface Contamination</button>
-            <button name="defect_type" value="slubs">Slubs</button>
-        </form>
+        <button id="start-btn"><i class="fas fa-play"></i> Start</button>
+        <button id="pause-resume-btn"><i class="fas fa-pause"></i> Pause</button>
+        <button id="stop-btn"><i class="fas fa-stop"></i> Stop</button>
     </div>
+
+    <!-- Defect Type Buttons -->
+    <div class="defect-buttons">
+        <button onclick="captureImage('holes')" class="defect-btn"><i class="fas fa-circle"></i> Holes</button>
+        <button onclick="captureImage('foreign_yarn')" class="defect-btn"><i class="fas fa-thread"></i> Foreign Yarn</button>
+        <button onclick="captureImage('surface_contamination')" class="defect-btn"><i class="fas fa-stain"></i> Surface Contamination</button>
+        <button onclick="captureImage('slubs')" class="defect-btn"><i class="fas fa-fiber"></i> Slubs</button>
+    </div>
+
+    <footer>
+        <p>Made with ❤️ by MAS Fabric Inspection Team</p>
+    </footer>
+
+    <script>
+        let isPaused = false;
+
+        function showSpinner() {
+            $('#loading-spinner').removeClass('hidden');
+        }
+
+        function hideSpinner() {
+            $('#loading-spinner').addClass('hidden');
+        }
+
+        $('#start-btn').click(function () {
+            showSpinner();
+            $.post('/control', { action: 'start' }, function (response) {
+                if (response.status === 'started') {
+                    $('#camera-stream').attr('src', '/video_feed');
+                    hideSpinner();
+                }
+            });
+        });
+
+        $('#pause-resume-btn').click(function () {
+            const action = isPaused ? 'resume' : 'pause';
+            $.post('/control', { action: action }, function (response) {
+                if (response.status === 'paused') {
+                    $('#pause-resume-btn').html('<i class="fas fa-play"></i> Resume');
+                    isPaused = true;
+                } else if (response.status === 'resumed') {
+                    $('#pause-resume-btn').html('<i class="fas fa-pause"></i> Pause');
+                    isPaused = false;
+                }
+            });
+        });
+
+        $('#stop-btn').click(function () {
+            showSpinner();
+            $.post('/control', { action: 'stop' }, function (response) {
+                if (response.status === 'stopped') {
+                    $('#camera-stream').attr('src', '');
+                    hideSpinner();
+                }
+            });
+        });
+
+        function captureImage(defectType) {
+            const button = $(`[onclick="captureImage('${defectType}')"]`);
+            button.addClass('clicked');
+            setTimeout(() => button.removeClass('clicked'), 300);
+
+            $.post('/capture', { defect_type: defectType }, function (response) {
+                if (response.status === 'image_saved') {
+                    alert(`Image saved: ${response.path}`);
+                } else {
+                    alert(`Error: ${response.message}`);
+                }
+            });
+        }
+    </script>
 </body>
 </html>

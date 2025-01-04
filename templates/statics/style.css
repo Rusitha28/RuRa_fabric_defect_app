@@ -1,35 +1,114 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
     text-align: center;
-    background-color: #f4f4f9;
+    color: #333;
 }
 
-h1 {
-    margin-top: 20px;
-    color: #333;
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
+    border-bottom: 5px solid #0056b3;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+header p {
+    margin: 5px 0 0;
+    font-size: 1.2rem;
+}
+
+.camera-feed {
+    position: relative;
 }
 
 .camera-feed img {
     width: 70%;
-    border: 2px solid #ccc;
-    margin: 10px;
+    margin: 20px auto;
+    border: 3px solid #ccc;
+    border-radius: 8px;
+    display: block;
 }
 
-.controls form {
-    margin: 10px;
+.spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 1.5rem;
+    color: #007bff;
 }
 
-button {
-    padding: 10px 15px;
-    margin: 5px;
+.spinner.hidden {
+    display: none;
+}
+
+.spinner i {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.controls {
+    margin-top: 20px;
+}
+
+.controls button {
+    padding: 10px 20px;
+    margin: 10px;
     font-size: 16px;
     background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-button:hover {
+.controls button:hover {
     background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.defect-buttons {
+    margin-top: 30px;
+}
+
+.defect-btn {
+    padding: 10px 20px;
+    margin: 10px 5px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.defect-btn.clicked {
+    background-color: #218838;
+    transform: scale(0.95);
+}
+
+.defect-btn:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+footer {
+    margin-top: 30px;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    font-size: 0.9rem;
+    border-top: 3px solid #555;
 }
