@@ -10,16 +10,18 @@
 </head>
 <body>
     <header>
-        <h1>Fabric Defect Detection</h1>
+        <h1 class="project-title">Fabric Defect Detection</h1>
         <p>Identify fabric defects with ease!</p>
     </header>
     
     <!-- Live Camera Feed -->
     <div class="camera-feed">
-        <img id="camera-stream" src="/video_feed" alt="Camera Feed">
-        <div id="loading-spinner" class="spinner hidden">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Loading...</p>
+        <div class="camera-frame">
+            <img id="camera-stream" src="/video_feed" alt="Camera Feed">
+            <div id="loading-spinner" class="spinner hidden">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Defect Identifying is Working.....</p>
+            </div>
         </div>
     </div>
     
@@ -30,16 +32,24 @@
         <button id="stop-btn"><i class="fas fa-stop"></i> Stop</button>
     </div>
 
+    <!-- Spacer between control buttons and defect buttons -->
+    <div class="spacer"></div>
+
     <!-- Defect Type Buttons -->
     <div class="defect-buttons">
         <button onclick="captureImage('holes')" class="defect-btn"><i class="fas fa-circle"></i> Holes</button>
         <button onclick="captureImage('foreign_yarn')" class="defect-btn"><i class="fas fa-thread"></i> Foreign Yarn</button>
         <button onclick="captureImage('surface_contamination')" class="defect-btn"><i class="fas fa-stain"></i> Surface Contamination</button>
         <button onclick="captureImage('slubs')" class="defect-btn"><i class="fas fa-fiber"></i> Slubs</button>
+        <button onclick="captureImage('dirty_mark')" class="defect-btn"><i class="fas fa-circle-notch"></i> Dirty Mark</button>
+        <button onclick="captureImage('knots')" class="defect-btn"><i class="fas fa-knot"></i> Knots</button>
+        <button onclick="captureImage('oil_mark')" class="defect-btn"><i class="fas fa-oil-can"></i> Oil Mark</button>
+        <button onclick="captureImage('miss_print')" class="defect-btn"><i class="fas fa-print"></i> Miss Print</button>
+        <button onclick="captureImage('dye_patch')" class="defect-btn"><i class="fas fa-palette"></i> Dye Patch</button>
     </div>
 
     <footer>
-        <p>Made with ❤️ by MAS Fabric Inspection Team</p>
+        <p>Crafted with precision by the RuRa Fabric Inspection Team 🧵✨</p>
     </footer>
 
     <script>

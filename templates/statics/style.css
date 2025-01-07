@@ -17,6 +17,7 @@ header {
 header h1 {
     margin: 0;
     font-size: 2.5rem;
+    color: #28a745; /* Green color for project name */
 }
 
 header p {
@@ -25,13 +26,23 @@ header p {
 }
 
 .camera-feed {
-    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.camera-frame {
+    border: 5px solid #007bff; /* Blue frame around the camera */
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #ffffff;
+    display: inline-block;
 }
 
 .camera-feed img {
-    width: 70%;
-    margin: 20px auto;
-    border: 3px solid #ccc;
+    width: 640px;
+    height: 480px;
     border-radius: 8px;
     display: block;
 }
@@ -57,8 +68,10 @@ header p {
     margin-bottom: 10px;
 }
 
+/* Add margin to the bottom of control buttons */
 .controls {
     margin-top: 20px;
+    margin-bottom: 30px; /* Space between controls and defect buttons */
 }
 
 .controls button {
@@ -79,7 +92,11 @@ header p {
 }
 
 .defect-buttons {
-    margin-top: 30px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px; /* Add space between buttons in the defect row */
 }
 
 .defect-btn {

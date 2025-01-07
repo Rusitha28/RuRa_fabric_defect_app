@@ -1,5 +1,6 @@
 from flask import Flask, render_template, Response, request, jsonify
 import cv2
+import numpy as np  # Import numpy for numerical operations
 import os
 
 app = Flask(__name__)
@@ -9,6 +10,15 @@ camera_index = 0  # Default camera index
 camera = None
 is_paused = False  # Track pause/resume state
 
+# List of all defect types
+defect_types = [
+    "holes", "foreign_yarn", "surface_contamination", "slubs",
+    "dirty_mark", "knots", "oil_mark", "miss_print", "dye_patch"
+]
+
+# Create folders for all defect types
+for defect in defect_types:
+    os.makedirs(f'data/{defect}', exist_ok=True)
 
 def initialize_camera():
     """Initialize the camera."""
@@ -19,7 +29,6 @@ def initialize_camera():
             print(f"Error: Could not open camera at index {camera_index}")
             camera = None
 
-
 def release_camera():
     """Release the camera."""
     global camera
@@ -27,6 +36,29 @@ def release_camera():
         camera.release()
         camera = None
 
+def preprocess_image(frame):
+    # Convert the frame to grayscale
+    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    
+    # Resize the frame to 64x64
+    resized_frame = cv2.resize(gray_frame, (64, 64))
+    
+    # Normalize the frame
+    normalized_frame = resized_frame.astype(np.float32) / 255.0
+    
+    # Expand dimensions to add channel for grayscale (1 channel)
+    expanded_frame = np.expand_dims(normalized_frame, axis=-1)
+    
+    # Convert grayscale to 3 channels by duplicating the grayscale channel
+    rgb_frame = np.concatenate([expanded_frame] * 3, axis=-1)
+    
+    # Convert to 8-bit unsigned integer (0-255)
+    rgb_frame = (rgb_frame * 255).astype(np.uint8)
+    
+    # Add batch dimension (if needed by the model)
+    batch_frame = np.expand_dims(rgb_frame, axis=0)
+    
+    return batch_frame
 
 def generate_frames():
     """Generate video frames for the video feed."""
@@ -56,18 +88,15 @@ def generate_frames():
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-
 @app.route('/')
 def index():
     """Render the main page."""
     return render_template('index.html')
 
-
 @app.route('/video_feed')
 def video_feed():
     """Video streaming route."""
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
 
 @app.route('/control', methods=['POST'])
 def control_camera():
@@ -91,10 +120,9 @@ def control_camera():
             return jsonify({'status': 'error', 'message': 'Failed to start camera'}), 500
     return '', 400
 
-
 @app.route('/capture', methods=['POST'])
 def capture_image():
-    """Capture and save an image."""
+    """Capture, preprocess, and save an image."""
     global camera
     defect_type = request.form.get('defect_type')
     if not camera or not camera.isOpened():
@@ -102,12 +130,16 @@ def capture_image():
 
     success, frame = camera.read()
     if success and defect_type:
+        # Preprocess the frame
+        preprocessed_frame = preprocess_image(frame)
+        # Remove batch dimension
+        preprocessed_frame = np.squeeze(preprocessed_frame, axis=0)
+        # Save the preprocessed image
         folder_path = f'data/{defect_type}'
         file_name = f"{folder_path}/{defect_type}_{len(os.listdir(folder_path)) + 1}.jpg"
-        cv2.imwrite(file_name, frame)
+        cv2.imwrite(file_name, preprocessed_frame)
         return jsonify({'status': 'image_saved', 'path': file_name})
     return jsonify({'status': 'error', 'message': 'Failed to capture image'}), 500
-
 
 if __name__ == '__main__':
     initialize_camera()  # Ensure the camera is initialized before starting
